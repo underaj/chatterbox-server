@@ -4,7 +4,7 @@ var app = {
   //TODO: The current 'toggleFriend' function just toggles the class 'friend'
   //to all messages sent by the user
   server: 'http://127.0.0.1:3000/classes/messages/',
-  username: 'anonymous',
+  username: 'bad boy',
   roomname: 'lobby',
   lastMessageId: 0,
   friends: {},
@@ -60,6 +60,7 @@ var app = {
       contentType: 'application/json',
       data: { order: '-createdAt'},
       success: function(data) {
+        data = JSON.parse(data);
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) { return; }
 
@@ -160,7 +161,7 @@ var app = {
       }
 
       var $message = $('<br><span/>');
-      $message.text(data.text).appendTo($chat);
+      $message.text(data.message).appendTo($chat);
 
       // Add the message to the UI
       app.$chats.append($chat);
@@ -212,8 +213,8 @@ var app = {
 
   handleSubmit: function(evt) {
     var message = {
-      username: app.username,
-      text: app.$message.val(),
+      username: app.username || 'duke',
+      message: app.$message.val(),
       roomname: app.roomname || 'lobby'
     };
 

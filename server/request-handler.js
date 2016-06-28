@@ -67,6 +67,8 @@ var requestHandler = function(request, response) {
     return fs.readFile(ROOTPATH + dir, function(error, html) {
       if (error) {
         console.log('html get error');
+        response.writeHead(404, headers);
+        response.end();
       } else {
         response.writeHead(statusCode, headers);
         response.write(html);
