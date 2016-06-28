@@ -15,7 +15,7 @@ var fs = require('fs');
 
 var ROOTPATH = __dirname + '/../client';
 
-var results = [{username: 'duke', message: 'im dirty'}];
+var results = [];
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -49,6 +49,13 @@ var requestHandler = function(request, response) {
     statusCode = 201;
     request.on('data', (dataChunck) => {
       results.unshift(JSON.parse(dataChunck));
+      var data = JSON.stringify(results);
+      fs.writeFile(__dirname + '/messages.json', data, (err) => {
+        if (err) {
+          throw err;
+        }
+        console.log('It\'s saved!');
+      });
     });
     break;
   }
@@ -73,6 +80,17 @@ var requestHandler = function(request, response) {
       }
       response.end();
       return;
+    });
+  }
+
+  if (request.method === 'POST') {
+
+  } else if (request.method === 'GET') {
+    fs.readFile(__dirname + '/messages.json', (err, data) => {
+      if (err) {
+        console.log('no messages');
+      }
+      results = JSON.parse(data);
     });
   }
   // Tell the client we are sending them plain text.
