@@ -11,7 +11,9 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var fs = require('fs');
 
+var results = [];
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -29,12 +31,28 @@ var requestHandler = function(request, response) {
   // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
+  // console.log(request);
   // The outgoing status.
   var statusCode = 200;
-
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
+  var giveBack = {results: results};
+  
+  if (request.method === 'OPTIONS') {
+    giveBack = headers['access-control-allow-methods'];
+  } else if (request.method === 'GET') {
 
+  } else if (request.method === 'POST') {
+    // console.log(request._postData);
+    request.on('data', (dataChunck) => {
+      results.unshift(JSON.parse(dataChunck));
+    });
+    // console.log(results);
+    statusCode = 201;
+  }
+  if (request.url.slice(0, 8) !== '/classes') {
+    statusCode = 404;
+  }
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
@@ -52,7 +70,8 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+  
+  response.end(JSON.stringify(giveBack));
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,3 +90,4 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
+exports.requestHandler = requestHandler;

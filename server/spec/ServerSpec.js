@@ -112,6 +112,7 @@ describe('Node Server Request Listener Function', function() {
     waitForThen(
       function() { return res._ended; },
       function() {
+        console.log(res._responseCode);
         expect(res._responseCode).to.equal(404);
       });
   });
