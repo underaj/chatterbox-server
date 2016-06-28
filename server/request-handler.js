@@ -12,7 +12,6 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 var fs = require('fs');
-
 var ROOTPATH = __dirname + '/../client';
 
 var results = [];
