@@ -13,7 +13,9 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var fs = require('fs');
 
-var results = [];
+var ROOTPATH = __dirname + '/../client';
+
+var results = [{username: 'duke', message: 'im dirty'}];
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -50,8 +52,28 @@ var requestHandler = function(request, response) {
     // console.log(results);
     statusCode = 201;
   }
+
   if (request.url.slice(0, 8) !== '/classes') {
-    statusCode = 404;
+    var dir;
+    if (request.url === '/') {
+      dir = '/index.html';
+      headers = {'Content-Type': 'text/html'};  
+    } else {
+      dir = request.url;
+      headers = {'Content-Type': 'text/css'}; 
+    }
+    // Check file at req.url exist, with the root at /client
+
+    return fs.readFile(ROOTPATH + dir, function(error, html) {
+      if (error) {
+        console.log('html get error');
+      } else {
+        response.writeHead(statusCode, headers);
+        response.write(html);
+        response.end();
+      }
+      return;
+    });
   }
   // Tell the client we are sending them plain text.
   //
