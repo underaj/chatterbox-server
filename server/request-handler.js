@@ -35,26 +35,25 @@ var requestHandler = function(request, response) {
 
   // console.log(request);
   // The outgoing status.
-  var statusCode = 200;
+  var statusCode, dir;
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
   var giveBack = {results: results};
-  
-  if (request.method === 'OPTIONS') {
+  switch (request.method) {
+  case 'OPTIONS':
     giveBack = headers['access-control-allow-methods'];
-  } else if (request.method === 'GET') {
-
-  } else if (request.method === 'POST') {
-    // console.log(request._postData);
+  case 'GET':
+    statusCode = 200;
+    break;
+  case 'POST':
+    statusCode = 201;
     request.on('data', (dataChunck) => {
       results.unshift(JSON.parse(dataChunck));
     });
-    // console.log(results);
-    statusCode = 201;
+    break;
   }
 
   if (request.url.slice(0, 8) !== '/classes') {
-    var dir;
     if (request.url === '/') {
       dir = '/index.html';
       headers = {'Content-Type': 'text/html'};  
@@ -68,12 +67,11 @@ var requestHandler = function(request, response) {
       if (error) {
         console.log('html get error');
         response.writeHead(404, headers);
-        response.end();
       } else {
         response.writeHead(statusCode, headers);
         response.write(html);
-        response.end();
       }
+      response.end();
       return;
     });
   }
@@ -82,11 +80,9 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = 'text/plain';
-
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   response.writeHead(statusCode, headers);
-
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
